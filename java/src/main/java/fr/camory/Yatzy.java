@@ -1,8 +1,9 @@
 package fr.camory;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
-import static java.util.Comparator.comparing;
+import static java.util.Comparator.*;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
@@ -63,36 +64,23 @@ public class Yatzy {
         return of(dice).filter(x -> x == die).sum();
     }
 
-    public int one_pair() {
-        return of(dice).boxed()
+    public int onePair() {
+        return reverseOrderedPairs().limit(1).findFirst().orElse(0) * 2;
+    }
+
+    public int twoPair() {
+        return reverseOrderedPairs().limit(2).mapToInt(Integer::intValue).sum() * 2;
+    }
+
+    private Stream<Integer> reverseOrderedPairs() {
+        return of(dice)
+                .boxed()
                 .collect(groupingBy(identity(), counting()))
                 .entrySet()
                 .stream()
                 .filter(dieCount -> dieCount.getValue() >= 2)
-                .max(comparing(Map.Entry::getKey))
                 .map(Map.Entry::getKey)
-                .orElse(0) * 2;
-    }
-
-    public static int two_pair(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] counts = new int[6];
-        counts[d1-1]++;
-        counts[d2-1]++;
-        counts[d3-1]++;
-        counts[d4-1]++;
-        counts[d5-1]++;
-        int n = 0;
-        int score = 0;
-        for (int i = 0; i < 6; i += 1)
-            if (counts[6-i-1] >= 2) {
-                n++;
-                score += (6-i);
-            }
-        if (n == 2)
-            return score * 2;
-        else
-            return 0;
+                .sorted(reverseOrder());
     }
 
     public static int four_of_a_kind(int _1, int _2, int d3, int d4, int d5)

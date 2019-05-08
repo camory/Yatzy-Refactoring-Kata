@@ -153,7 +153,7 @@ public class YatzyTest {
     }
 
     @Test
-    public void one_pair() {
+    public void one_pair_should_sum_dice_of_the_pair() {
         // given
         final Yatzy player1 = new Yatzy(3, 4, 3, 5, 6);
         final Yatzy player2 = new Yatzy(5, 3, 3, 3, 5);
@@ -161,10 +161,10 @@ public class YatzyTest {
         final Yatzy player4 = new Yatzy(1, 2, 3, 4, 5);
 
         // when
-        final int pair1 = player1.one_pair();
-        final int pair2 = player2.one_pair();
-        final int pair3 = player3.one_pair();
-        final int pair4 = player4.one_pair();
+        final int pair1 = player1.onePair();
+        final int pair2 = player2.onePair();
+        final int pair3 = player3.onePair();
+        final int pair4 = player4.onePair();
 
         // then
         assertThat(pair1).isEqualTo(6);
@@ -174,9 +174,18 @@ public class YatzyTest {
     }
 
     @Test
-    public void two_Pair() {
-        assertEquals(16, Yatzy.two_pair(3,3,5,4,5));
-        assertEquals(16, Yatzy.two_pair(3,3,5,5,5));
+    public void two_pair_should_sum_dice_of_the_two_pair() {
+        // given
+        final Yatzy player1 = new Yatzy(3, 3, 5, 4, 5);
+        final Yatzy player2 = new Yatzy(3, 3, 5, 5, 5);
+
+        // when
+        final int twoPair1 = player1.twoPair();
+        final int twoPair2 = player2.twoPair();
+
+        // then
+        assertThat(twoPair1).isEqualTo(16);
+        assertThat(twoPair2).isEqualTo(16);
     }
 
     @Test
@@ -213,4 +222,3 @@ public class YatzyTest {
         assertEquals(0, Yatzy.fullHouse(2,3,4,5,6));
     }
 }
-
