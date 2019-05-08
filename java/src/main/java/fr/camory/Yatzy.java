@@ -2,6 +2,7 @@ package fr.camory;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
@@ -10,57 +11,57 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.IntStream.of;
 
-public class Yatzy {
+class Yatzy {
 
     private static final HashSet<Integer> SMALL_STRAIGHT = new HashSet<>(asList(1, 2, 3, 4, 5));
     private static final HashSet<Integer> LARGE_STRAIGHT = new HashSet<>(asList(2, 3, 4, 5, 6));
 
     private final int[] dice;
 
-    public Yatzy(int d1, int d2, int d3, int d4, int d5) {
+    Yatzy(int d1, int d2, int d3, int d4, int d5) {
         if (!isSixSidedDice(d1, d2, d3, d4, d5)) {
             throw new IllegalStateException("Yatzy is only played with Six Sided Dice");
         }
 
-        dice = new int[] {d1, d2, d3, d4, d5};
+        dice = new int[]{d1, d2, d3, d4, d5};
     }
 
     private boolean isSixSidedDice(int... dice) {
         return of(dice).allMatch(die -> die >= 1 && die <= 6);
     }
 
-    public int chance() {
+    int chance() {
         return of(dice).sum();
     }
 
-    public int yatzy() {
+    int yatzy() {
         return of(dice)
                 .boxed()
                 .collect(groupingBy(identity(), counting()))
                 .size() == 1 ? 50 : 0;
     }
 
-    public int ones() {
+    int ones() {
         return count(1);
     }
 
-    public int twos() {
+    int twos() {
         return count(2);
     }
 
-    public int threes() {
+    int threes() {
         return count(3);
     }
 
-    public int fours() {
+    int fours() {
         return count(4);
     }
 
-    public int fives() {
+    int fives() {
         return count(5);
     }
 
-    public int sixes() {
+    int sixes() {
         return count(6);
     }
 
@@ -68,12 +69,20 @@ public class Yatzy {
         return of(dice).filter(x -> x == die).sum();
     }
 
-    public int onePair() {
-        return reverseOrderedGroupsBy(2).limit(1).findFirst().orElse(0) * 2;
+    int onePair() {
+        return reverseOrderedGroupsBy(2).findFirst().orElse(0) * 2;
     }
 
-    public int twoPair() {
+    int twoPair() {
         return reverseOrderedGroupsBy(2).limit(2).mapToInt(Integer::intValue).sum() * 2;
+    }
+
+    int fourOfAKind() {
+        return reverseOrderedGroupsBy(4).findFirst().orElse(0) * 4;
+    }
+
+    int threeOfAKind() {
+        return reverseOrderedGroupsBy(3).findFirst().orElse(0) * 3;
     }
 
     private Stream<Integer> reverseOrderedGroupsBy(int value) {
@@ -87,56 +96,20 @@ public class Yatzy {
                 .sorted(reverseOrder());
     }
 
-    public int fourOfAKind() {
-        return reverseOrderedGroupsBy(4).limit(1).findFirst().orElse(0) * 4;
-    }
-
-    public int threeOfAKind() {
-        return reverseOrderedGroupsBy(3).findFirst().orElse(0) * 3;
-    }
-
-    public int smallStraight() {
+    int smallStraight() {
         return SMALL_STRAIGHT.equals(of(dice).boxed().collect(toSet())) ? 15 : 0;
     }
 
-    public int largeStraight() {
+    int largeStraight() {
         return LARGE_STRAIGHT.equals(of(dice).boxed().collect(toSet())) ? 20 : 0;
     }
 
-    public static int fullHouse(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] tallies;
-        boolean _2 = false;
-        int i;
-        int _2_at = 0;
-        boolean _3 = false;
-        int _3_at = 0;
+    int fullHouse() {
+        final Optional<Integer> maybePair = reverseOrderedGroupsBy(2).findFirst();
+        final Optional<Integer> maybeThreeOfKind = reverseOrderedGroupsBy(3).findFirst();
 
-
-
-
-        tallies = new int[6];
-        tallies[d1-1] += 1;
-        tallies[d2-1] += 1;
-        tallies[d3-1] += 1;
-        tallies[d4-1] += 1;
-        tallies[d5-1] += 1;
-
-        for (i = 0; i != 6; i += 1)
-            if (tallies[i] == 2) {
-                _2 = true;
-                _2_at = i+1;
-            }
-
-        for (i = 0; i != 6; i += 1)
-            if (tallies[i] == 3) {
-                _3 = true;
-                _3_at = i+1;
-            }
-
-        if (_2 && _3)
-            return _2_at * 2 + _3_at * 3;
-        else
-            return 0;
+        return maybePair.flatMap(pair ->
+                maybeThreeOfKind.map(three -> three.equals(pair) ? 0 : three * 3 + pair * 2)
+        ).orElse(0);
     }
 }

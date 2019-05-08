@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertEquals;
 
 public class YatzyTest {
 
@@ -261,8 +260,29 @@ public class YatzyTest {
     }
 
     @Test
-    public void fullHouse() {
-        assertEquals(18, Yatzy.fullHouse(6,2,2,2,6));
-        assertEquals(0, Yatzy.fullHouse(2,3,4,5,6));
+    public void fullHouse_should_sum_the_dice() {
+        // given
+        final Yatzy player1 = new Yatzy(6, 2, 2, 2, 6);
+        final Yatzy player2 = new Yatzy(2, 3, 4, 5, 6);
+
+        // when
+        final int fullHouse1 = player1.fullHouse();
+        final int fullHouse2 = player2.fullHouse();
+
+        // then
+        assertThat(fullHouse1).isEqualTo(18);
+        assertThat(fullHouse2).isEqualTo(0);
+    }
+
+    @Test
+    public void yatzi_is_not_a_fullHouse() {
+        // given
+        final Yatzy player1 = new Yatzy(4, 4, 4, 4, 4);
+
+        // when
+        final int fullHouse1 = player1.fullHouse();
+
+        // then
+        assertThat(fullHouse1).isEqualTo(0);
     }
 }
