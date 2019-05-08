@@ -2,9 +2,16 @@ package fr.camory;
 
 import org.junit.*;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.*;
 
 public class YatzyTest {
+
+    @Test
+    public void yatzy_is_only_played_with_6_sided_dice() {
+        assertThatExceptionOfType(IllegalStateException.class).as("die value must not be greater than 6").isThrownBy(() -> new Yatzy(1, 2, 3, 4, 8));
+        assertThatExceptionOfType(IllegalStateException.class).as("die value must not be lesser than 1").isThrownBy(() -> new Yatzy(0, 2, 3, 4, 5));
+    }
 
     @Test
     public void chance_scores_sum_of_all_dice() {
@@ -42,7 +49,7 @@ public class YatzyTest {
     }
 
     @Test
-    public void fours_test() 
+    public void fours_test()
     {
         assertEquals(12, new Yatzy(4,4,4,5,5).fours());
         assertEquals(8, new Yatzy(4,4,5,5,5).fours());
@@ -77,7 +84,7 @@ public class YatzyTest {
     }
 
     @Test
-    public void three_of_a_kind() 
+    public void three_of_a_kind()
     {
         assertEquals(9, Yatzy.three_of_a_kind(3,3,3,4,5));
         assertEquals(15, Yatzy.three_of_a_kind(5,3,5,4,5));

@@ -1,6 +1,21 @@
 package fr.camory;
+import static java.util.stream.Stream.of;
 
 public class Yatzy {
+
+    private final int[] dice;
+
+    public Yatzy(int d1, int d2, int d3, int d4, int d5) {
+        if (!isSixSidedDice(d1, d2, d3, d4, d5)) {
+            throw new IllegalStateException("Yatzy is only played with Six Sided Dice");
+        }
+
+        dice = new int[] {d1, d2, d3, d4, d5};
+    }
+
+    private boolean isSixSidedDice(Integer... dice) {
+        return of(dice).allMatch(die -> die >= 1 && die <= 6);
+    }
 
     public static int chance(int d1, int d2, int d3, int d4, int d5)
     {
@@ -30,7 +45,7 @@ public class Yatzy {
         if (d2 == 1) sum++;
         if (d3 == 1) sum++;
         if (d4 == 1) sum++;
-        if (d5 == 1) 
+        if (d5 == 1)
             sum++;
 
         return sum;
@@ -47,7 +62,7 @@ public class Yatzy {
     }
 
     public static int threes(int d1, int d2, int d3, int d4, int d5) {
-        int s;    
+        int s;
         s = 0;
         if (d1 == 3) s += 3;
         if (d2 == 3) s += 3;
@@ -57,20 +72,9 @@ public class Yatzy {
         return s;
     }
 
-    protected int[] dice;
-    public Yatzy(int d1, int d2, int d3, int d4, int _5)
-    {
-        dice = new int[5];
-        dice[0] = d1;
-        dice[1] = d2;
-        dice[2] = d3;
-        dice[3] = d4;
-        dice[4] = _5;
-    }
-
     public int fours()
     {
-        int sum;    
+        int sum;
         sum = 0;
         for (int at = 0; at != 5; at++) {
             if (dice[at] == 4) {
@@ -84,7 +88,7 @@ public class Yatzy {
     {
         int s = 0;
         int i;
-        for (i = 0; i < dice.length; i++) 
+        for (i = 0; i < dice.length; i++)
             if (dice[i] == 5)
                 s = s + 5;
         return s;
@@ -93,7 +97,7 @@ public class Yatzy {
     public int sixes()
     {
         int sum = 0;
-        for (int at = 0; at < dice.length; at++) 
+        for (int at = 0; at < dice.length; at++)
             if (dice[at] == 6)
                 sum = sum + 6;
         return sum;
@@ -128,7 +132,7 @@ public class Yatzy {
             if (counts[6-i-1] >= 2) {
                 n++;
                 score += (6-i);
-            }        
+            }
         if (n == 2)
             return score * 2;
         else
@@ -175,10 +179,10 @@ public class Yatzy {
         tallies[d4-1] += 1;
         tallies[d5-1] += 1;
         if (tallies[0] == 1 &&
-            tallies[1] == 1 &&
-            tallies[2] == 1 &&
-            tallies[3] == 1 &&
-            tallies[4] == 1)
+                tallies[1] == 1 &&
+                tallies[2] == 1 &&
+                tallies[3] == 1 &&
+                tallies[4] == 1)
             return 15;
         return 0;
     }
@@ -193,10 +197,10 @@ public class Yatzy {
         tallies[d4-1] += 1;
         tallies[d5-1] += 1;
         if (tallies[1] == 1 &&
-            tallies[2] == 1 &&
-            tallies[3] == 1 &&
-            tallies[4] == 1
-            && tallies[5] == 1)
+                tallies[2] == 1 &&
+                tallies[3] == 1 &&
+                tallies[4] == 1
+                && tallies[5] == 1)
             return 20;
         return 0;
     }
