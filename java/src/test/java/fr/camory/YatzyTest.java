@@ -2,6 +2,7 @@ package fr.camory;
 
 import org.junit.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.*;
 
@@ -15,10 +16,17 @@ public class YatzyTest {
 
     @Test
     public void chance_scores_sum_of_all_dice() {
-        int expected = 15;
-        int actual = Yatzy.chance(2,3,4,5,1);
-        assertEquals(expected, actual);
-        assertEquals(16, Yatzy.chance(3,3,4,5,1));
+        // given
+        final Yatzy yatzy1 = new Yatzy(2, 3, 4, 5, 1);
+        final Yatzy yatzy2 = new Yatzy(3, 3, 4, 5, 1);
+
+        // when
+        final int chance1 = yatzy1.chance();
+        final int chance2 = yatzy2.chance();
+
+        // then
+        assertThat(chance1).isEqualTo(15);
+        assertThat(chance2).isEqualTo(16);
     }
 
     @Test public void yatzy_scores_50() {

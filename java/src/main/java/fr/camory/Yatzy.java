@@ -1,4 +1,7 @@
 package fr.camory;
+
+import java.util.stream.IntStream;
+
 import static java.util.stream.Stream.of;
 
 public class Yatzy {
@@ -17,15 +20,8 @@ public class Yatzy {
         return of(dice).allMatch(die -> die >= 1 && die <= 6);
     }
 
-    public static int chance(int d1, int d2, int d3, int d4, int d5)
-    {
-        int total = 0;
-        total += d1;
-        total += d2;
-        total += d3;
-        total += d4;
-        total += d5;
-        return total;
+    public int chance() {
+        return IntStream.of(dice).sum();
     }
 
     public static int yatzy(int... dice)
@@ -242,6 +238,3 @@ public class Yatzy {
             return 0;
     }
 }
-
-
-
