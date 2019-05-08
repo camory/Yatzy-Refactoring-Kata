@@ -1,10 +1,11 @@
 package fr.camory;
 
-import org.junit.*;
+import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class YatzyTest {
 
@@ -17,24 +18,34 @@ public class YatzyTest {
     @Test
     public void chance_scores_sum_of_all_dice() {
         // given
-        final Yatzy yatzy1 = new Yatzy(2, 3, 4, 5, 1);
-        final Yatzy yatzy2 = new Yatzy(3, 3, 4, 5, 1);
+        final Yatzy player1 = new Yatzy(2, 3, 4, 5, 1);
+        final Yatzy player2 = new Yatzy(3, 3, 4, 5, 1);
 
         // when
-        final int chance1 = yatzy1.chance();
-        final int chance2 = yatzy2.chance();
+        final int chance1 = player1.chance();
+        final int chance2 = player2.chance();
 
         // then
         assertThat(chance1).isEqualTo(15);
         assertThat(chance2).isEqualTo(16);
     }
 
-    @Test public void yatzy_scores_50() {
-        int expected = 50;
-        int actual = Yatzy.yatzy(4,4,4,4,4);
-        assertEquals(expected, actual);
-        assertEquals(50, Yatzy.yatzy(6,6,6,6,6));
-        assertEquals(0, Yatzy.yatzy(6,6,6,6,3));
+    @Test
+    public void yatzy_scores_50() {
+        // given
+        final Yatzy player1 = new Yatzy(4, 4, 4, 4, 4);
+        final Yatzy player2 = new Yatzy(6, 6, 6, 6, 6);
+        final Yatzy player3 = new Yatzy(6, 6, 6, 6, 3);
+
+        // when
+        final int yatzy1 = player1.yatzy();
+        final int yatzy2 = player2.yatzy();
+        final int yatzy3 = player3.yatzy();
+
+        // then
+        assertThat(yatzy1).isEqualTo(50);
+        assertThat(yatzy2).isEqualTo(50);
+        assertThat(yatzy3).isEqualTo(0);
     }
 
     @Test public void test_1s() {

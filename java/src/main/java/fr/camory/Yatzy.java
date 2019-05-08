@@ -1,8 +1,9 @@
 package fr.camory;
 
-import java.util.stream.IntStream;
-
-import static java.util.stream.Stream.of;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.IntStream.of;
 
 public class Yatzy {
 
@@ -16,23 +17,19 @@ public class Yatzy {
         dice = new int[] {d1, d2, d3, d4, d5};
     }
 
-    private boolean isSixSidedDice(Integer... dice) {
+    private boolean isSixSidedDice(int... dice) {
         return of(dice).allMatch(die -> die >= 1 && die <= 6);
     }
 
     public int chance() {
-        return IntStream.of(dice).sum();
+        return of(dice).sum();
     }
 
-    public static int yatzy(int... dice)
-    {
-        int[] counts = new int[6];
-        for (int die : dice)
-            counts[die-1]++;
-        for (int i = 0; i != 6; i++)
-            if (counts[i] == 5)
-                return 50;
-        return 0;
+    public int yatzy() {
+        return of(dice)
+                .boxed()
+                .collect(groupingBy(identity(), counting()))
+                .size() == 1 ? 50 : 0;
     }
 
     public static int ones(int d1, int d2, int d3, int d4, int d5) {
