@@ -1,15 +1,19 @@
 package fr.camory;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static java.util.Comparator.*;
+import static java.util.Arrays.asList;
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.*;
 import static java.util.stream.IntStream.of;
 
 public class Yatzy {
+
+    private static final HashSet<Integer> SMALL_STRAIGHT = new HashSet<>(asList(1, 2, 3, 4, 5));
+    private static final HashSet<Integer> LARGE_STRAIGHT = new HashSet<>(asList(2, 3, 4, 5, 6));
 
     private final int[] dice;
 
@@ -91,40 +95,12 @@ public class Yatzy {
         return reverseOrderedGroupsBy(3).findFirst().orElse(0) * 3;
     }
 
-    public static int smallStraight(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] tallies;
-        tallies = new int[6];
-        tallies[d1-1] += 1;
-        tallies[d2-1] += 1;
-        tallies[d3-1] += 1;
-        tallies[d4-1] += 1;
-        tallies[d5-1] += 1;
-        if (tallies[0] == 1 &&
-                tallies[1] == 1 &&
-                tallies[2] == 1 &&
-                tallies[3] == 1 &&
-                tallies[4] == 1)
-            return 15;
-        return 0;
+    public int smallStraight() {
+        return SMALL_STRAIGHT.equals(of(dice).boxed().collect(toSet())) ? 15 : 0;
     }
 
-    public static int largeStraight(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] tallies;
-        tallies = new int[6];
-        tallies[d1-1] += 1;
-        tallies[d2-1] += 1;
-        tallies[d3-1] += 1;
-        tallies[d4-1] += 1;
-        tallies[d5-1] += 1;
-        if (tallies[1] == 1 &&
-                tallies[2] == 1 &&
-                tallies[3] == 1 &&
-                tallies[4] == 1
-                && tallies[5] == 1)
-            return 20;
-        return 0;
+    public int largeStraight() {
+        return LARGE_STRAIGHT.equals(of(dice).boxed().collect(toSet())) ? 20 : 0;
     }
 
     public static int fullHouse(int d1, int d2, int d3, int d4, int d5)

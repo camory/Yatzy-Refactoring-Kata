@@ -225,17 +225,39 @@ public class YatzyTest {
     }
 
     @Test
-    public void smallStraight() {
-        assertEquals(15, Yatzy.smallStraight(1,2,3,4,5));
-        assertEquals(15, Yatzy.smallStraight(2,3,4,5,1));
-        assertEquals(0, Yatzy.smallStraight(1,2,2,4,5));
+    public void small_straight_should_score_15() {
+        // given
+        final Yatzy player1 = new Yatzy(1, 2, 3, 4, 5);
+        final Yatzy player2 = new Yatzy(2, 3, 4, 5, 1);
+        final Yatzy player3 = new Yatzy(1, 2, 2, 4, 5);
+
+        // when
+        final int smallStraight1 = player1.smallStraight();
+        final int smallStraight2 = player2.smallStraight();
+        final int smallStraight3 = player3.smallStraight();
+
+        // then
+        assertThat(smallStraight1).isEqualTo(15);
+        assertThat(smallStraight2).isEqualTo(15);
+        assertThat(smallStraight3).isEqualTo(0);
     }
 
     @Test
-    public void largeStraight() {
-        assertEquals(20, Yatzy.largeStraight(6,2,3,4,5));
-        assertEquals(20, Yatzy.largeStraight(2,3,4,5,6));
-        assertEquals(0, Yatzy.largeStraight(1,2,2,4,5));
+    public void large_straight_should_score_20() {
+        // given
+        final Yatzy player1 = new Yatzy(6,2,3,4,5);
+        final Yatzy player2 = new Yatzy(2,3,4,5,6);
+        final Yatzy player3 = new Yatzy(1,2,2,4,5);
+
+        // when
+        final int largeStraight1 = player1.largeStraight();
+        final int largeStraight2 = player2.largeStraight();
+        final int largeStraight3 = player3.largeStraight();
+
+        // then
+        assertThat(largeStraight1).isEqualTo(20);
+        assertThat(largeStraight2).isEqualTo(20);
+        assertThat(largeStraight3).isEqualTo(0);
     }
 
     @Test
