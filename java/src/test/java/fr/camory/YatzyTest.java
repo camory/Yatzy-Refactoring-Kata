@@ -1,4 +1,7 @@
+package fr.camory;
+
 import org.junit.*;
+
 import static org.junit.Assert.*;
 
 public class YatzyTest {
