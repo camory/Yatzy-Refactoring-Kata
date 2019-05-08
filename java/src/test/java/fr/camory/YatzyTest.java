@@ -5,7 +5,6 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class YatzyTest {
 
@@ -70,37 +69,87 @@ public class YatzyTest {
     }
 
     @Test
-    public void test_2s() {
-        assertEquals(4, Yatzy.twos(1,2,3,2,6));
-        assertEquals(10, Yatzy.twos(2,2,2,2,2));
+    public void twos_should_sum_2s() {
+        // given
+        final Yatzy player1 = new Yatzy(1, 2, 3, 2, 6);
+        final Yatzy player2 = new Yatzy(2, 2, 2, 2, 2);
+
+        // when
+        final int twos1 = player1.twos();
+        final int twos2 = player2.twos();
+
+        // then
+        assertThat(twos1).isEqualTo(4);
+        assertThat(twos2).isEqualTo(10);
     }
 
     @Test
-    public void test_threes() {
-        assertEquals(6, Yatzy.threes(1,2,3,2,3));
-        assertEquals(12, Yatzy.threes(2,3,3,3,3));
+    public void threes_should_sum_3s() {
+        // given
+        final Yatzy player1 = new Yatzy(1,2,3,2,3);
+        final Yatzy player2 = new Yatzy(2,3,3,3,3);
+
+        // when
+        final int threes1 = player1.threes();
+        final int threes2 = player2.threes();
+
+        // then
+        assertThat(threes1).isEqualTo(6);
+        assertThat(threes2).isEqualTo(12);
     }
 
     @Test
-    public void fours_test()
-    {
-        assertEquals(12, new Yatzy(4,4,4,5,5).fours());
-        assertEquals(8, new Yatzy(4,4,5,5,5).fours());
-        assertEquals(4, new Yatzy(4,5,5,5,5).fours());
+    public void fours_should_sum_4s() {
+        // given
+        final Yatzy player1 = new Yatzy(4,4,4,5,5);
+        final Yatzy player2 = new Yatzy(4,4,5,5,5);
+        final Yatzy player3 = new Yatzy(4,5,5,5,5);
+
+        // when
+        final int fours1 = player1.fours();
+        final int fours2 = player2.fours();
+        final int fours3 = player3.fours();
+
+        // then
+        assertThat(fours1).isEqualTo(12);
+        assertThat(fours2).isEqualTo(8);
+        assertThat(fours3).isEqualTo(4);
     }
 
     @Test
-    public void fives() {
-        assertEquals(10, new Yatzy(4,4,4,5,5).fives());
-        assertEquals(15, new Yatzy(4,4,5,5,5).fives());
-        assertEquals(20, new Yatzy(4,5,5,5,5).fives());
+    public void fives_should_sum_5s() {
+        // given
+        final Yatzy player1 = new  Yatzy(4,4,4,5,5);
+        final Yatzy player2 = new Yatzy(4,4,5,5,5);
+        final Yatzy player3 = new Yatzy(4,5,5,5,5);
+
+        // when
+        final int fives1 = player1.fives();
+        final int fives2 = player2.fives();
+        final int fives3 = player3.fives();
+
+        // then
+        assertThat(fives1).isEqualTo(10);
+        assertThat(fives2).isEqualTo(15);
+        assertThat(fives3).isEqualTo(20);
     }
 
     @Test
-    public void sixes_test() {
-        assertEquals(0, new Yatzy(4,4,4,5,5).sixes());
-        assertEquals(6, new Yatzy(4,4,6,5,5).sixes());
-        assertEquals(18, new Yatzy(6,5,6,6,5).sixes());
+    public void sixes_should_sum_6s() {
+        // given
+        final Yatzy player1 = new  Yatzy(4,4,4,5,5);
+        final Yatzy player2 = new Yatzy(4,4,6,5,5);
+        final Yatzy player3 = new Yatzy(6,5,6,6,5);
+
+        // when
+        final int sixes1 = player1.sixes();
+        final int sixes2 = player2.sixes();
+        final int sixes3 = player3.sixes();
+
+        // then
+        assertThat(sixes1).isEqualTo(0);
+        assertThat(sixes2).isEqualTo(6);
+        assertThat(sixes3).isEqualTo(18);
     }
 
     @Test
@@ -151,3 +200,4 @@ public class YatzyTest {
         assertEquals(0, Yatzy.fullHouse(2,3,4,5,6));
     }
 }
+
