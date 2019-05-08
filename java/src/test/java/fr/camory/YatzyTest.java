@@ -16,7 +16,7 @@ public class YatzyTest {
     }
 
     @Test
-    public void chance_scores_sum_of_all_dice() {
+    public void chance_should_scores_sum_of_all_dice() {
         // given
         final Yatzy player1 = new Yatzy(2, 3, 4, 5, 1);
         final Yatzy player2 = new Yatzy(3, 3, 4, 5, 1);
@@ -31,7 +31,7 @@ public class YatzyTest {
     }
 
     @Test
-    public void yatzy_scores_50() {
+    public void yatzy_should_scores_50() {
         // given
         final Yatzy player1 = new Yatzy(4, 4, 4, 4, 4);
         final Yatzy player2 = new Yatzy(6, 6, 6, 6, 6);
@@ -48,11 +48,25 @@ public class YatzyTest {
         assertThat(yatzy3).isEqualTo(0);
     }
 
-    @Test public void test_1s() {
-        assertTrue(Yatzy.ones(1,2,3,4,5) == 1);
-        assertEquals(2, Yatzy.ones(1,2,1,4,5));
-        assertEquals(0, Yatzy.ones(6,2,2,4,5));
-        assertEquals(4, Yatzy.ones(1,2,1,1,1));
+    @Test
+    public void ones_should_sum_1s() {
+        // given
+        final Yatzy player1 = new Yatzy(1, 2, 3, 4, 5);
+        final Yatzy player2 = new Yatzy(1, 2, 1, 4, 5);
+        final Yatzy player3 = new Yatzy(6, 2, 2, 4, 5);
+        final Yatzy player4 = new Yatzy(1, 2, 1, 1, 1);
+
+        // when
+        final int ones1 = player1.ones();
+        final int ones2 = player2.ones();
+        final int ones3 = player3.ones();
+        final int ones4 = player4.ones();
+
+        // then
+        assertThat(ones1).isEqualTo(1);
+        assertThat(ones2).isEqualTo(2);
+        assertThat(ones3).isEqualTo(0);
+        assertThat(ones4).isEqualTo(4);
     }
 
     @Test
