@@ -154,9 +154,23 @@ public class YatzyTest {
 
     @Test
     public void one_pair() {
-        assertEquals(6, Yatzy.score_pair(3,4,3,5,6));
-        assertEquals(10, Yatzy.score_pair(5,3,3,3,5));
-        assertEquals(12, Yatzy.score_pair(5,3,6,6,5));
+        // given
+        final Yatzy player1 = new Yatzy(3, 4, 3, 5, 6);
+        final Yatzy player2 = new Yatzy(5, 3, 3, 3, 5);
+        final Yatzy player3 = new Yatzy(5, 3, 6, 6, 5);
+        final Yatzy player4 = new Yatzy(1, 2, 3, 4, 5);
+
+        // when
+        final int pair1 = player1.one_pair();
+        final int pair2 = player2.one_pair();
+        final int pair3 = player3.one_pair();
+        final int pair4 = player4.one_pair();
+
+        // then
+        assertThat(pair1).isEqualTo(6);
+        assertThat(pair2).isEqualTo(10);
+        assertThat(pair3).isEqualTo(12);
+        assertThat(pair4).isEqualTo(0);
     }
 
     @Test
@@ -166,8 +180,7 @@ public class YatzyTest {
     }
 
     @Test
-    public void three_of_a_kind()
-    {
+    public void three_of_a_kind() {
         assertEquals(9, Yatzy.three_of_a_kind(3,3,3,4,5));
         assertEquals(15, Yatzy.three_of_a_kind(5,3,5,4,5));
         assertEquals(9, Yatzy.three_of_a_kind(3,3,3,3,5));
