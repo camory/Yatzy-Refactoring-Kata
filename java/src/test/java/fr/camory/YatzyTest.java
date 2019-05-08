@@ -189,17 +189,39 @@ public class YatzyTest {
     }
 
     @Test
-    public void three_of_a_kind() {
-        assertEquals(9, Yatzy.three_of_a_kind(3,3,3,4,5));
-        assertEquals(15, Yatzy.three_of_a_kind(5,3,5,4,5));
-        assertEquals(9, Yatzy.three_of_a_kind(3,3,3,3,5));
+    public void three_of_a_kind_should_sum_dice_of_the_three() {
+        // given
+        final Yatzy player1 = new Yatzy(3, 3, 3, 4, 5);
+        final Yatzy player2 = new Yatzy(5, 3, 5, 4, 5);
+        final Yatzy player3 = new Yatzy(3, 3, 3, 3, 5);
+
+        // when
+        final int threeOfAKind1 = player1.threeOfAKind();
+        final int threeOfAKind2 = player2.threeOfAKind();
+        final int threeOfAKind3 = player3.threeOfAKind();
+
+        // then
+        assertThat(threeOfAKind1).isEqualTo(9);
+        assertThat(threeOfAKind2).isEqualTo(15);
+        assertThat(threeOfAKind3).isEqualTo(9);
     }
 
     @Test
-    public void four_of_a_knd() {
-        assertEquals(12, Yatzy.four_of_a_kind(3,3,3,3,5));
-        assertEquals(20, Yatzy.four_of_a_kind(5,5,5,4,5));
-        assertEquals(9, Yatzy.three_of_a_kind(3,3,3,3,3));
+    public void four_of_a_kind_should_sum_dice_of_the_three() {
+        // given
+        final Yatzy player1 = new Yatzy(3,3,3,3,5);
+        final Yatzy player2 = new Yatzy(5,5,5,4,5);
+        final Yatzy player3 = new Yatzy(3,3,3,3,3);
+
+        // when
+        final int fourOfAKind1 = player1.fourOfAKind();
+        final int fourOfAKind2 = player2.fourOfAKind();
+        final int fourOfAKind3 = player3.fourOfAKind();
+
+        // then
+        assertThat(fourOfAKind1).isEqualTo(12);
+        assertThat(fourOfAKind2).isEqualTo(20);
+        assertThat(fourOfAKind3).isEqualTo(12);
     }
 
     @Test
