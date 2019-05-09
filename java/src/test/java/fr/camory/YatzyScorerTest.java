@@ -1,288 +1,264 @@
 package fr.camory;
 
-import org.junit.Test;
+import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import org.junit.runner.RunWith;
+
+import java.util.stream.Stream;
 
 import static fr.camory.Die.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
+@RunWith(JUnitQuickcheck.class)
 public class YatzyScorerTest {
 
-    @Test
-    public void chance_should_scores_sum_of_all_dice() {
-        // given
-        final YatzyThrow throw1 = new YatzyThrow(TWO, THREE, FOUR, FIVE, ONE);
-        final YatzyThrow throw2 = new YatzyThrow(THREE, THREE, FOUR, FIVE, ONE);
+    @Property
+    public void chance_should_score_sum_of_all_dice(YatzyThrow yatzyThrow) {
+        //given
 
         // when
-        final long chance1 = YatzyScorer.chance(throw1);
-        final long chance2 = YatzyScorer.chance(throw2);
+        final long score = YatzyScorer.chance(yatzyThrow);
 
         // then
-        assertThat(chance1).isEqualTo(15);
-        assertThat(chance2).isEqualTo(16);
+        assertThat(score).isEqualTo(yatzyThrow.stream().mapToLong(Die::value).sum());
     }
 
-    @Test
-    public void yatzy_should_scores_50() {
+    @Property
+    public void yatzy_should_score_50_with_five_equal_die(Die die) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(FOUR, FOUR, FOUR, FOUR, FOUR);
-        final YatzyThrow throw2 = new YatzyThrow(SIX, SIX, SIX, SIX, SIX);
-        final YatzyThrow throw3 = new YatzyThrow(SIX, SIX, SIX, SIX, THREE);
+        final YatzyThrow yatzyThrow = new YatzyThrow(die, die, die, die, die);
 
         // when
-        final long yatzy1 = YatzyScorer.yatzy(throw1);
-        final long yatzy2 = YatzyScorer.yatzy(throw2);
-        final long yatzy3 = YatzyScorer.yatzy(throw3);
+        final long score = YatzyScorer.yatzy(yatzyThrow);
 
         // then
-        assertThat(yatzy1).isEqualTo(50);
-        assertThat(yatzy2).isEqualTo(50);
-        assertThat(yatzy3).isEqualTo(0);
+        assertThat(score).isEqualTo(50);
     }
 
-    @Test
-    public void ones_should_sum_1s() {
+    @Property
+    public void yatzy_should_score_0_with_five_non_equal_die(Die d1, Die d2, Die d3, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(ONE, TWO, THREE, FOUR, FIVE);
-        final YatzyThrow throw2 = new YatzyThrow(ONE, TWO, ONE, FOUR, FIVE);
-        final YatzyThrow throw3 = new YatzyThrow(SIX, TWO, TWO, FOUR, FIVE);
-        final YatzyThrow throw4 = new YatzyThrow(ONE, TWO, ONE, ONE, ONE);
+        assumeThat(Stream.of(d1, d2, d3, d4, d5).distinct().count()).isNotEqualTo(1);
+        final YatzyThrow yatzyThrow = new YatzyThrow(d1, d2, d3, d4, d5);
 
         // when
-        final long ones1 = YatzyScorer.ones(throw1);
-        final long ones2 = YatzyScorer.ones(throw2);
-        final long ones3 = YatzyScorer.ones(throw3);
-        final long ones4 = YatzyScorer.ones(throw4);
+        final long score = YatzyScorer.yatzy(yatzyThrow);
 
         // then
-        assertThat(ones1).isEqualTo(1);
-        assertThat(ones2).isEqualTo(2);
-        assertThat(ones3).isEqualTo(0);
-        assertThat(ones4).isEqualTo(4);
+        assertThat(score).isEqualTo(0);
     }
 
-    @Test
-    public void twos_should_sum_2s() {
+    @Property
+    public void ones_should_sum_1s(Die d1, Die d2, Die d3, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(ONE, TWO, THREE, TWO, SIX);
-        final YatzyThrow throw2 = new YatzyThrow(TWO, TWO, TWO, TWO, TWO);
+        final YatzyThrow yatzyThrow = new YatzyThrow(d1, d2, d3, d4, d5);
 
         // when
-        final long twos1 = YatzyScorer.twos(throw1);
-        final long twos2 = YatzyScorer.twos(throw2);
+        final long score = YatzyScorer.ones(yatzyThrow);
 
         // then
-        assertThat(twos1).isEqualTo(4);
-        assertThat(twos2).isEqualTo(10);
+        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 1).sum());
     }
 
-    @Test
-    public void threes_should_sum_3s() {
+    @Property
+    public void twos_should_sum_2s(Die d1, Die d2, Die d3, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(ONE,TWO,THREE,TWO,THREE);
-        final YatzyThrow throw2 = new YatzyThrow(TWO,THREE,THREE,THREE,THREE);
+        final YatzyThrow yatzyThrow = new YatzyThrow(d1, d2, d3, d4, d5);
 
         // when
-        final long threes1 = YatzyScorer.threes(throw1);
-        final long threes2 = YatzyScorer.threes(throw2);
+        final long score = YatzyScorer.twos(yatzyThrow);
 
         // then
-        assertThat(threes1).isEqualTo(6);
-        assertThat(threes2).isEqualTo(12);
+        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 2).sum());
     }
 
-    @Test
-    public void fours_should_sum_4s() {
+    @Property
+    public void threes_should_sum_3s(Die d1, Die d2, Die d3, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(FOUR,FOUR,FOUR,FIVE,FIVE);
-        final YatzyThrow throw2 = new YatzyThrow(FOUR,FOUR,FIVE,FIVE,FIVE);
-        final YatzyThrow throw3 = new YatzyThrow(FOUR,FIVE,FIVE,FIVE,FIVE);
+        final YatzyThrow yatzyThrow = new YatzyThrow(d1, d2, d3, d4, d5);
 
         // when
-        final long fours1 = YatzyScorer.fours(throw1);
-        final long fours2 = YatzyScorer.fours(throw2);
-        final long fours3 = YatzyScorer.fours(throw3);
+        final long score = YatzyScorer.threes(yatzyThrow);
 
         // then
-        assertThat(fours1).isEqualTo(12);
-        assertThat(fours2).isEqualTo(8);
-        assertThat(fours3).isEqualTo(4);
+        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 3).sum());
     }
 
-    @Test
-    public void fives_should_sum_5s() {
+    @Property
+    public void fours_should_sum_4s(Die d1, Die d2, Die d3, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(FOUR,FOUR,FOUR,FIVE,FIVE);
-        final YatzyThrow throw2 = new YatzyThrow(FOUR,FOUR,FIVE,FIVE,FIVE);
-        final YatzyThrow throw3 = new YatzyThrow(FOUR,FIVE,FIVE,FIVE,FIVE);
+        final YatzyThrow yatzyThrow = new YatzyThrow(d1, d2, d3, d4, d5);
 
         // when
-        final long fives1 = YatzyScorer.fives(throw1);
-        final long fives2 = YatzyScorer.fives(throw2);
-        final long fives3 = YatzyScorer.fives(throw3);
+        final long score = YatzyScorer.fours(yatzyThrow);
 
         // then
-        assertThat(fives1).isEqualTo(10);
-        assertThat(fives2).isEqualTo(15);
-        assertThat(fives3).isEqualTo(20);
+        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 4).sum());
     }
 
-    @Test
-    public void sixes_should_sum_6s() {
+    @Property
+    public void fives_should_sum_5s(Die d1, Die d2, Die d3, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(FOUR,FOUR,FOUR,FIVE,FIVE);
-        final YatzyThrow throw2 = new YatzyThrow(FOUR,FOUR,SIX,FIVE,FIVE);
-        final YatzyThrow throw3 = new YatzyThrow(SIX,FIVE,SIX,SIX,FIVE);
+        final YatzyThrow yatzyThrow = new YatzyThrow(d1, d2, d3, d4, d5);
 
         // when
-        final long sixes1 = YatzyScorer.sixes(throw1);
-        final long sixes2 = YatzyScorer.sixes(throw2);
-        final long sixes3 = YatzyScorer.sixes(throw3);
+        final long score = YatzyScorer.fives(yatzyThrow);
 
         // then
-        assertThat(sixes1).isEqualTo(0);
-        assertThat(sixes2).isEqualTo(6);
-        assertThat(sixes3).isEqualTo(18);
+        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 5).sum());
     }
 
-    @Test
-    public void one_pair_should_sum_dice_of_the_pair() {
+    @Property
+    public void sixes_should_sum_6s(Die d1, Die d2, Die d3, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(THREE, FOUR, THREE, FIVE, SIX);
-        final YatzyThrow throw2 = new YatzyThrow(FIVE, THREE, THREE, THREE, FIVE);
-        final YatzyThrow throw3 = new YatzyThrow(FIVE, THREE, SIX, SIX, FIVE);
-        final YatzyThrow throw4 = new YatzyThrow(ONE, TWO, THREE, FOUR, FIVE);
+        final YatzyThrow yatzyThrow = new YatzyThrow(d1, d2, d3, d4, d5);
 
         // when
-        final long pair1 = YatzyScorer.onePair(throw1);
-        final long pair2 = YatzyScorer.onePair(throw2);
-        final long pair3 = YatzyScorer.onePair(throw3);
-        final long pair4 = YatzyScorer.onePair(throw4);
+        final long score = YatzyScorer.sixes(yatzyThrow);
 
         // then
-        assertThat(pair1).isEqualTo(6);
-        assertThat(pair2).isEqualTo(10);
-        assertThat(pair3).isEqualTo(12);
-        assertThat(pair4).isEqualTo(0);
+        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 6).sum());
     }
 
-    @Test
-    public void two_pair_should_sum_dice_of_the_two_pair() {
+    @Property
+    public void one_pair_should_sum_dice_of_the_pair(Die pair, Die d3, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(THREE, THREE, FIVE, FOUR, FIVE);
-        final YatzyThrow throw2 = new YatzyThrow(THREE, THREE, FIVE, FIVE, FIVE);
-        final YatzyThrow throw3 = new YatzyThrow(THREE, THREE, FOUR, ONE, FIVE);
-        final YatzyThrow throw4 = new YatzyThrow(THREE, THREE, THREE, THREE, THREE);
+        assumeThat(Stream.of(d3,d4,d5).distinct().count()).isEqualTo(3);
+        final YatzyThrow yatzyThrow = new YatzyThrow(pair, pair, d3, d4, d5);
+        // when
+        final long score = YatzyScorer.onePair(yatzyThrow);
+
+        // then
+        assertThat(score).isEqualTo(pair.value() * 2);
+    }
+
+    @Property
+    public void two_pair_should_sum_dice_of_the_two_pair(Die pair1, Die pair2, Die d5) {
+        // given
+        final YatzyThrow yatzyThrow = new YatzyThrow(pair1, pair1, pair2, pair2, d5);
 
         // when
-        final long twoPair1 = YatzyScorer.twoPair(throw1);
-        final long twoPair2 = YatzyScorer.twoPair(throw2);
-        final long twoPair3 = YatzyScorer.twoPair(throw3);
-        final long twoPair4 = YatzyScorer.twoPair(throw4);
+        final long score = YatzyScorer.twoPair(yatzyThrow);
 
         // then
-        assertThat(twoPair1).isEqualTo(16);
-        assertThat(twoPair2).isEqualTo(16);
-        assertThat(twoPair3).isEqualTo(0);
-        assertThat(twoPair4).isEqualTo(12);
+        assertThat(score).isEqualTo((pair1.value() + pair2.value()) * 2);
     }
 
-    @Test
-    public void three_of_a_kind_should_sum_dice_of_the_three() {
+    @Property
+    public void one_pair_should_not_score_two_pair(Die pair, Die d3, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(THREE, THREE, THREE, FOUR, FIVE);
-        final YatzyThrow throw2 = new YatzyThrow(FIVE, THREE, FIVE, FOUR, FIVE);
-        final YatzyThrow throw3 = new YatzyThrow(THREE, THREE, THREE, THREE, FIVE);
+        assumeThat(Stream.of(pair, d3,d4,d5).distinct().count()).isEqualTo(4);
+        final YatzyThrow yatzyThrow = new YatzyThrow(pair, pair, d3, d4, d5);
 
         // when
-        final long threeOfAKind1 = YatzyScorer.threeOfAKind(throw1);
-        final long threeOfAKind2 = YatzyScorer.threeOfAKind(throw2);
-        final long threeOfAKind3 = YatzyScorer.threeOfAKind(throw3);
+        final long score = YatzyScorer.twoPair(yatzyThrow);
 
         // then
-        assertThat(threeOfAKind1).isEqualTo(9);
-        assertThat(threeOfAKind2).isEqualTo(15);
-        assertThat(threeOfAKind3).isEqualTo(9);
+        assertThat(score).isEqualTo(0);
     }
 
-    @Test
-    public void four_of_a_kind_should_sum_dice_of_the_three() {
+    @Property
+    public void three_of_a_kind_should_sum_dice_of_the_three(Die threeOfAKind, Die d4, Die d5) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(THREE,THREE,THREE,THREE,FIVE);
-        final YatzyThrow throw2 = new YatzyThrow(FIVE,FIVE,FIVE,FOUR,FIVE);
-        final YatzyThrow throw3 = new YatzyThrow(THREE,THREE,THREE,THREE,THREE);
+        final YatzyThrow yatzyThrow = new YatzyThrow(threeOfAKind, threeOfAKind, threeOfAKind, d4, d5);
 
         // when
-        final long fourOfAKind1 = YatzyScorer.fourOfAKind(throw1);
-        final long fourOfAKind2 = YatzyScorer.fourOfAKind(throw2);
-        final long fourOfAKind3 = YatzyScorer.fourOfAKind(throw3);
+        final long score = YatzyScorer.threeOfAKind(yatzyThrow);
 
         // then
-        assertThat(fourOfAKind1).isEqualTo(12);
-        assertThat(fourOfAKind2).isEqualTo(20);
-        assertThat(fourOfAKind3).isEqualTo(12);
+        assertThat(score).isEqualTo(threeOfAKind.value() * 3);
     }
 
-    @Test
+    @Property
+    public void four_of_a_kind_should_sum_dice_of_the_four(Die fourOfAKind, Die d5) {
+        // given
+        final YatzyThrow yatzyThrow = new YatzyThrow(fourOfAKind, fourOfAKind, fourOfAKind, fourOfAKind, d5);
+
+        // when
+        final long score = YatzyScorer.fourOfAKind(yatzyThrow);
+
+        // then
+        assertThat(score).isEqualTo(fourOfAKind.value() * 4);
+    }
+
+    @Property
     public void small_straight_should_score_15() {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(ONE, TWO, THREE, FOUR, FIVE);
-        final YatzyThrow throw2 = new YatzyThrow(TWO, THREE, FOUR, FIVE, ONE);
-        final YatzyThrow throw3 = new YatzyThrow(ONE, TWO, TWO, FOUR, FIVE);
+        final YatzyThrow yatzyThrow = new YatzyThrow(ONE, TWO, THREE, FOUR, FIVE);
 
         // when
-        final long smallStraight1 = YatzyScorer.smallStraight(throw1);
-        final long smallStraight2 = YatzyScorer.smallStraight(throw2);
-        final long smallStraight3 = YatzyScorer.smallStraight(throw3);
+        final long score = YatzyScorer.smallStraight(yatzyThrow);
 
         // then
-        assertThat(smallStraight1).isEqualTo(15);
-        assertThat(smallStraight2).isEqualTo(15);
-        assertThat(smallStraight3).isEqualTo(0);
+        assertThat(score).isEqualTo(15);
     }
 
-    @Test
+    @Property
+    public void small_straight_should_score_0_when_it_is_not_small_straight(YatzyThrow yatzyThrow) {
+        // given
+        assumeThat(
+                (yatzyThrow.stream().distinct().count() == 5 && !yatzyThrow.contains(ONE))
+                        || yatzyThrow.stream().distinct().count() != 5)
+                .isTrue();
+
+        // when
+        final long score = YatzyScorer.smallStraight(yatzyThrow);
+
+        // then
+        assertThat(score).isEqualTo(0);
+    }
+
+    @Property
     public void large_straight_should_score_20() {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(SIX,TWO,THREE,FOUR,FIVE);
-        final YatzyThrow throw2 = new YatzyThrow(TWO,THREE,FOUR,FIVE,SIX);
-        final YatzyThrow throw3 = new YatzyThrow(ONE,TWO,TWO,FOUR,FIVE);
+        final YatzyThrow yatzyThrow = new YatzyThrow(TWO, THREE, FOUR, FIVE, SIX);
 
         // when
-        final long largeStraight1 = YatzyScorer.largeStraight(throw1);
-        final long largeStraight2 = YatzyScorer.largeStraight(throw2);
-        final long largeStraight3 = YatzyScorer.largeStraight(throw3);
+        final long score = YatzyScorer.largeStraight(yatzyThrow);
 
         // then
-        assertThat(largeStraight1).isEqualTo(20);
-        assertThat(largeStraight2).isEqualTo(20);
-        assertThat(largeStraight3).isEqualTo(0);
+        assertThat(score).isEqualTo(20);
     }
 
-    @Test
-    public void fullHouse_should_sum_the_dice() {
+    @Property
+    public void large_straight_should_score_0_when_it_is_not_large_straight(YatzyThrow yatzyThrow) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(SIX, TWO, TWO, TWO, SIX);
-        final YatzyThrow throw2 = new YatzyThrow(TWO, THREE, FOUR, FIVE, SIX);
+        assumeThat(
+                (yatzyThrow.stream().distinct().count() == 5 && !yatzyThrow.contains(SIX))
+                        || yatzyThrow.stream().distinct().count() != 5)
+                .isTrue();
 
         // when
-        final long fullHouse1 = YatzyScorer.fullHouse(throw1);
-        final long fullHouse2 = YatzyScorer.fullHouse(throw2);
+        final long score = YatzyScorer.largeStraight(yatzyThrow);
 
         // then
-        assertThat(fullHouse1).isEqualTo(18);
-        assertThat(fullHouse2).isEqualTo(0);
+        assertThat(score).isEqualTo(0);
     }
 
-    @Test
-    public void yatzi_is_not_a_fullHouse() {
+    @Property
+    public void fullHouse_should_sum_the_dice(Die pair, Die three) {
         // given
-        final YatzyThrow throw1 = new YatzyThrow(FOUR, FOUR, FOUR, FOUR, FOUR);
+        assumeThat(pair.value()).isNotEqualTo(three.value());
+        final YatzyThrow yatzyThrow = new YatzyThrow(pair, pair, three, three, three);
 
         // when
-        final long fullHouse1 = YatzyScorer.fullHouse(throw1);
+        final long score = YatzyScorer.fullHouse(yatzyThrow);
 
         // then
-        assertThat(fullHouse1).isEqualTo(0);
+        assertThat(score).isEqualTo(pair.value() * 2 + three.value() * 3);
+    }
+
+    @Property
+    public void yatzi_is_not_a_fullHouse(Die d1) {
+        // given
+        final YatzyThrow yatzyThrow = new YatzyThrow(d1, d1, d1, d1, d1);
+
+        // when
+        final long score = YatzyScorer.fullHouse(yatzyThrow);
+
+        // then
+        assertThat(score).isEqualTo(0);
     }
 }
+

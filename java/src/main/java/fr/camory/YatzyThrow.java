@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
@@ -15,7 +14,7 @@ public class YatzyThrow {
     private final List<Die> dice;
 
     public YatzyThrow(Die d1, Die d2, Die d3, Die d4, Die d5) {
-        dice = unmodifiableList(asList(d1, d2, d3, d4, d5));
+        dice = asList(d1, d2, d3, d4, d5);
     }
 
     Stream<Die> stream() {
