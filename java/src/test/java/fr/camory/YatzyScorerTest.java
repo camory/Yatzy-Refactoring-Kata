@@ -2,9 +2,9 @@ package fr.camory;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.List;
 import org.junit.runner.RunWith;
-
-import java.util.stream.Stream;
 
 import static fr.camory.Die.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +21,7 @@ public class YatzyScorerTest {
         final long score = YatzyScorer.chance(yatzyThrow);
 
         // then
-        assertThat(score).isEqualTo(yatzyThrow.stream().mapToLong(Die::value).sum());
+        assertThat(score).isEqualTo(yatzyThrow.dice().map(Die::value).sum().intValue());
     }
 
     @Property
@@ -39,7 +39,7 @@ public class YatzyScorerTest {
     @Property
     public void yatzy_should_score_0_with_five_non_equal_die(Die d1, Die d2, Die d3, Die d4, Die d5) {
         // given
-        assumeThat(Stream.of(d1, d2, d3, d4, d5).distinct().count()).isNotEqualTo(1);
+        assumeThat(HashSet.of(d1, d2, d3, d4, d5).size()).isNotEqualTo(1);
         final YatzyThrow yatzyThrow = new YatzyThrow(d1, d2, d3, d4, d5);
 
         // when
@@ -58,19 +58,18 @@ public class YatzyScorerTest {
         final long score = YatzyScorer.ones(yatzyThrow);
 
         // then
-        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 1).sum());
+        assertThat(score).isEqualTo(List.of(d1, d2, d3, d4, d5).map(Die::value).filter(i -> i == 1).sum().intValue());
     }
 
     @Property
     public void twos_should_sum_2s(Die d1, Die d2, Die d3, Die d4, Die d5) {
         // given
         final YatzyThrow yatzyThrow = new YatzyThrow(d1, d2, d3, d4, d5);
-
         // when
         final long score = YatzyScorer.twos(yatzyThrow);
 
         // then
-        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 2).sum());
+        assertThat(score).isEqualTo(List.of(d1, d2, d3, d4, d5).map(Die::value).filter(i -> i == 2).sum().intValue());
     }
 
     @Property
@@ -82,7 +81,7 @@ public class YatzyScorerTest {
         final long score = YatzyScorer.threes(yatzyThrow);
 
         // then
-        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 3).sum());
+        assertThat(score).isEqualTo(List.of(d1, d2, d3, d4, d5).map(Die::value).filter(i -> i == 3).sum().intValue());
     }
 
     @Property
@@ -94,7 +93,7 @@ public class YatzyScorerTest {
         final long score = YatzyScorer.fours(yatzyThrow);
 
         // then
-        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 4).sum());
+        assertThat(score).isEqualTo(List.of(d1, d2, d3, d4, d5).map(Die::value).filter(i -> i == 4).sum().intValue());
     }
 
     @Property
@@ -106,7 +105,7 @@ public class YatzyScorerTest {
         final long score = YatzyScorer.fives(yatzyThrow);
 
         // then
-        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 5).sum());
+        assertThat(score).isEqualTo(List.of(d1, d2, d3, d4, d5).map(Die::value).filter(i -> i == 5).sum().intValue());
     }
 
     @Property
@@ -118,13 +117,13 @@ public class YatzyScorerTest {
         final long score = YatzyScorer.sixes(yatzyThrow);
 
         // then
-        assertThat(score).isEqualTo(Stream.of(d1, d2, d3, d4, d5).mapToLong(Die::value).filter(i -> i == 6).sum());
+        assertThat(score).isEqualTo(List.of(d1, d2, d3, d4, d5).map(Die::value).filter(i -> i == 6).sum().intValue());
     }
 
     @Property
     public void one_pair_should_sum_dice_of_the_pair(Die pair, Die d3, Die d4, Die d5) {
         // given
-        assumeThat(Stream.of(d3,d4,d5).distinct().count()).isEqualTo(3);
+        assumeThat(HashSet.of(d3,d4,d5).size()).isEqualTo(3);
         final YatzyThrow yatzyThrow = new YatzyThrow(pair, pair, d3, d4, d5);
         // when
         final long score = YatzyScorer.onePair(yatzyThrow);
@@ -137,7 +136,6 @@ public class YatzyScorerTest {
     public void two_pair_should_sum_dice_of_the_two_pair(Die pair1, Die pair2, Die d5) {
         // given
         final YatzyThrow yatzyThrow = new YatzyThrow(pair1, pair1, pair2, pair2, d5);
-
         // when
         final long score = YatzyScorer.twoPair(yatzyThrow);
 
@@ -148,7 +146,7 @@ public class YatzyScorerTest {
     @Property
     public void one_pair_should_not_score_two_pair(Die pair, Die d3, Die d4, Die d5) {
         // given
-        assumeThat(Stream.of(pair, d3,d4,d5).distinct().count()).isEqualTo(4);
+        assumeThat(HashSet.of(pair, d3,d4,d5).size()).isEqualTo(4);
         final YatzyThrow yatzyThrow = new YatzyThrow(pair, pair, d3, d4, d5);
 
         // when
@@ -198,8 +196,8 @@ public class YatzyScorerTest {
     public void small_straight_should_score_0_when_it_is_not_small_straight(YatzyThrow yatzyThrow) {
         // given
         assumeThat(
-                (yatzyThrow.stream().distinct().count() == 5 && !yatzyThrow.contains(ONE))
-                        || yatzyThrow.stream().distinct().count() != 5)
+                (yatzyThrow.dice().distinct().size() == 5 && !yatzyThrow.contains(ONE))
+                        || yatzyThrow.dice().distinct().size() != 5)
                 .isTrue();
 
         // when
@@ -225,8 +223,8 @@ public class YatzyScorerTest {
     public void large_straight_should_score_0_when_it_is_not_large_straight(YatzyThrow yatzyThrow) {
         // given
         assumeThat(
-                (yatzyThrow.stream().distinct().count() == 5 && !yatzyThrow.contains(SIX))
-                        || yatzyThrow.stream().distinct().count() != 5)
+                (yatzyThrow.dice().distinct().size() == 5 && !yatzyThrow.contains(SIX))
+                        || yatzyThrow.dice().distinct().size() != 5)
                 .isTrue();
 
         // when

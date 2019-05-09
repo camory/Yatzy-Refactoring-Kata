@@ -1,111 +1,101 @@
 package fr.camory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import io.vavr.Tuple2;
+import io.vavr.collection.Map;
+import io.vavr.control.Option;
+
 import java.util.function.Predicate;
 
 import static fr.camory.Die.*;
+import static io.vavr.API.*;
 import static java.util.Comparator.comparingInt;
-import static java.util.stream.Collectors.toList;
 
 class YatzyScorer {
 
-    static long chance(YatzyThrow yatzyThrow) {
-        return yatzyThrow.stream()
-                .mapToInt(Die::value)
-                .sum();
+    static int chance(YatzyThrow yatzyThrow) {
+        return yatzyThrow.dice().map(Die::value).sum().intValue();
     }
 
-    static long yatzy(YatzyThrow yatzyThrow) {
-        return yatzyThrow.diceCount().count() == 1 ? 50 : 0;
+    static int yatzy(YatzyThrow yatzyThrow) {
+        return yatzyThrow.diceCount().size() == 1 ? 50 : 0;
     }
 
-    static long ones(YatzyThrow yatzyThrow) {
-        return yatzyThrow.count(ONE).orElse(0L) * ONE.value();
+    static int ones(YatzyThrow yatzyThrow) {
+        return count(yatzyThrow, ONE);
     }
 
-    static long twos(YatzyThrow yatzyThrow) {
-        return yatzyThrow.count(TWO).orElse(0L) * TWO.value();
+    static int twos(YatzyThrow yatzyThrow) {
+        return count(yatzyThrow, TWO);
     }
 
-    static long threes(YatzyThrow yatzyThrow) {
-        return yatzyThrow.count(THREE).orElse(0L) * THREE.value();
+    static int threes(YatzyThrow yatzyThrow) {
+        return count(yatzyThrow, THREE);
     }
 
-    static long fours(YatzyThrow yatzyThrow) {
-        return yatzyThrow.count(FOUR).orElse(0L) * FOUR.value();
+    static int fours(YatzyThrow yatzyThrow) {
+        return count(yatzyThrow, FOUR);
     }
 
-    static long fives(YatzyThrow yatzyThrow) {
-        return yatzyThrow.count(FIVE).orElse(0L) * FIVE.value();
+    static int fives(YatzyThrow yatzyThrow) {
+        return count(yatzyThrow, FIVE);
     }
 
-    static long sixes(YatzyThrow yatzyThrow) {
-        return yatzyThrow.count(SIX).orElse(0L) * SIX.value();
+    static int sixes(YatzyThrow yatzyThrow) {
+        return count(yatzyThrow, SIX);
     }
 
-    static long onePair(YatzyThrow yatzyThrow) {
+    private static int count(YatzyThrow yatzyThrow, Die die) {
+        return yatzyThrow.diceCount().get(die).getOrElse(0) * die.value();
+    }
+
+    static int onePair(YatzyThrow yatzyThrow) {
         return yatzyThrow.diceCount()
-                .filter(byAtLeastCount(2))
-                .max(comparingInt(dieCount -> dieCount.getKey().value()))
-                .map(dieCount -> dieCount.getKey().value())
-                .orElse(0) * 2;
+                .filterValues(v -> v >= 2)
+                .maxBy(comparingInt(dieCount1 -> dieCount1._1.value()))
+                .map(dieCount -> dieCount._1.value())
+                .getOrElse(0) * 2;
     }
 
-    static long twoPair(YatzyThrow yatzyThrow) {
-        final List<Map.Entry<Die, Long>> pairs = yatzyThrow.diceCount().filter(byAtLeastCount(2)).collect(toList());
+    static int twoPair(YatzyThrow yatzyThrow) {
+        final Map<Die, Integer> pairs = yatzyThrow.diceCount().filterValues(v -> v >= 2);
+        final Predicate<Map<Die, Integer>> is2Pairs = p -> pairs.size() == 2;
+        final Predicate<Map<Die, Integer>> isMore3OfAKind = p -> pairs.size() == 1 && pairs.get()._2 > 3;
 
-        if (pairs.size() == 2) {
-            return (pairs.get(0).getKey().value() + pairs.get(1).getKey().value()) * 2;
-        }
-
-        if (pairs.size() == 1 && pairs.get(0).getValue() > 3) {
-            return pairs.get(0).getKey().value() * 4;
-        }
-
-        return 0;
+        return Match(pairs).of(
+                Case($(is2Pairs), pairs.map(dieCount -> dieCount._1.value()).sum().intValue() * 2),
+                Case($(isMore3OfAKind), pairs.get()._1.value() * 4),
+                Case($(), 0)
+        );
     }
 
-    static long threeOfAKind(YatzyThrow yatzyThrow) {
+    static int threeOfAKind(YatzyThrow yatzyThrow) {
         return yatzyThrow.diceCount()
-                .filter(byAtLeastCount(3))
-                .findFirst()
-                .map(dieCount -> dieCount.getKey().value())
-                .orElse(0) * 3;
+                .find(dieCount -> dieCount._2 >= 3)
+                .map(dieCount -> dieCount._1.value())
+                .getOrElse(0) * 3;
     }
 
-    static long fourOfAKind(YatzyThrow yatzyThrow) {
+    static int fourOfAKind(YatzyThrow yatzyThrow) {
         return yatzyThrow.diceCount()
-                .filter(byAtLeastCount(4))
-                .findFirst()
-                .map(dieCount -> dieCount.getKey().value())
-                .orElse(0) * 4;
+                .find(dieCount -> dieCount._2 >= 4)
+                .map(dieCount -> dieCount._1.value())
+                .getOrElse(0) * 4;
     }
 
-    static long smallStraight(YatzyThrow yatzyThrow) {
-        return yatzyThrow.diceCount().count() == 5 && yatzyThrow.contains(ONE) ? 15 : 0;
+    static int smallStraight(YatzyThrow yatzyThrow) {
+        return yatzyThrow.diceCount().size() == 5 && yatzyThrow.contains(ONE) ? 15 : 0;
     }
 
-    static long largeStraight(YatzyThrow yatzyThrow) {
-        return yatzyThrow.diceCount().count() == 5 && yatzyThrow.contains(SIX) ? 20 : 0;
+    static int largeStraight(YatzyThrow yatzyThrow) {
+        return yatzyThrow.diceCount().size() == 5 && yatzyThrow.contains(SIX) ? 20 : 0;
     }
 
-    static long fullHouse(final YatzyThrow yatzyThrow) {
-        final Optional<Map.Entry<Die, Long>> maybeThree = yatzyThrow.diceCount().filter(byCount(3)).findFirst();
-        return maybeThree.flatMap(three -> yatzyThrow.diceCount()
-                .filter(byCount(2))
-                .findFirst()
-                .map(two -> two.getKey().value() * 2 + three.getKey().value() * 3)
-        ).orElse(0);
-    }
-
-
-    private static Predicate<Map.Entry<Die, Long>> byCount(long count) {
-        return dieCount -> dieCount.getValue() == count;
-    }
-
-    private static Predicate<Map.Entry<Die, Long>> byAtLeastCount(long count) {
-        return dieCount -> dieCount.getValue() >= count;
+    static int fullHouse(final YatzyThrow yatzyThrow) {
+        final Option<Tuple2<Die, Integer>> maybeThree = yatzyThrow.diceCount().find(dieCount -> dieCount._2 == 3);
+        return maybeThree.flatMap(three ->
+                yatzyThrow.diceCount()
+                        .find(dieCount -> dieCount._2 == 2)
+                        .map(pair -> three._1.value() * 3 + pair._1.value() * 2)
+        ).getOrElse(0);
     }
 }
