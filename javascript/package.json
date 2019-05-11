@@ -2,7 +2,9 @@
   "name": "yatzy-refactoring-kata",
   "version": "0.0.1",
   "description": "Code for a refactoring exercise about the game of Yatzy",
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.11"
+  },
   "devDependencies": {
     "mocha": "~1.17"
   }
