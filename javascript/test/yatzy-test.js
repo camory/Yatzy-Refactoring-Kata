@@ -1,288 +1,235 @@
+const _ = require("lodash");
 const assert = require("assert");
+const jsc = require('jsverify');
 const YatzyScorer = require("../lib/yatzy_scorer");
 const YatzyThrow = require("../lib/yatzy_throw");
-
+const Generators = require("./generators");
 
 describe('Chance', () => {
     it('should score sum of all dice', () => {
-        // given
-        let throw1 = new YatzyThrow(2, 3, 4, 5, 1);
-        let throw2 = new YatzyThrow(3, 3, 4, 5, 1);
+        jsc.checkForall(Generators.yatzyThrowGenerator, yatzyThrow => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.chance(throw1);
-        let score2 = YatzyScorer.chance(throw2);
+            // when
+            let score = YatzyScorer.chance(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 15);
-        assert.strictEqual(score2, 16);
+            // then
+            return _.isEqual(score, yatzyThrow.dice[0] + yatzyThrow.dice[1] + yatzyThrow.dice[2] + yatzyThrow.dice[3] + yatzyThrow.dice[4]);
+        })
     });
 });
 
 describe("YatzyScorer", () => {
     it("should scores 50", () => {
-        // given
-        let throw1 = new YatzyThrow(4, 4, 4, 4, 4);
-        let throw2 = new YatzyThrow(6, 6, 6, 6, 6);
+        jsc.checkForall(jsc.integer(1, 6), die => {
+            // given
+            let yatzyThrow = new YatzyThrow(die, die, die, die, die);
 
-        // when
-        let score1 = YatzyScorer.yatzy(throw1);
-        let score2 = YatzyScorer.yatzy(throw2);
+            // when
+            let score = YatzyScorer.yatzy(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 50);
-        assert.strictEqual(score2, 50);
+            // then
+            return _.isEqual(score, 50);
+        });
     });
-    it("should scores 0", () => {
-        // given
-        let throw1 = new YatzyThrow(6, 6, 6, 6, 2);
+    it('should score 0', () => {
+        jsc.checkForall(Generators.notYatzyArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.yatzy(throw1);
+            // when
+            let score = YatzyScorer.yatzy(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 0);
+            // then
+            return _.isEqual(score, 0);
+        })
     });
 });
 
+
 describe("Ones", () => {
     it("should score the sum of 1s", () => {
-        // given
-        let throw1 = new YatzyThrow(1, 2, 3, 4, 5);
-        let throw2 = new YatzyThrow(1, 2, 1, 4, 5);
-        let throw3 = new YatzyThrow(6, 2, 2, 4, 5);
-        let throw4 = new YatzyThrow(1, 2, 1, 1, 1);
+        jsc.checkForall(Generators.yatzyThrowGenerator, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.ones(throw1);
-        let score2 = YatzyScorer.ones(throw2);
-        let score3 = YatzyScorer.ones(throw3);
-        let score4 = YatzyScorer.ones(throw4);
+            // when
+            let score = YatzyScorer.ones(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 1);
-        assert.strictEqual(score2, 2);
-        assert.strictEqual(score3, 0);
-        assert.strictEqual(score4, 4);
+            // then
+            return _.isEqual(score, _.reduce(yatzyThrow.dice, (acc, die) => die === 1 ? acc + die : acc, 0));
+        });
     });
 });
 
 describe("Twos", () => {
     it("should score the sum of 2s", () => {
-        // given
-        let throw1 = new YatzyThrow(1, 2, 3, 2, 6);
-        let throw2 = new YatzyThrow(2, 2, 2, 2, 2);
+        jsc.checkForall(Generators.yatzyThrowGenerator, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.twos(throw1);
-        let score2 = YatzyScorer.twos(throw2);
+            // when
+            let score = YatzyScorer.twos(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 4);
-        assert.strictEqual(score2, 10);
+            // then
+            return _.isEqual(score, _.reduce(yatzyThrow.dice, (acc, die) => die === 2 ? acc + die : acc, 0));
+        });
     });
 });
 
 describe("Threes", () => {
     it("should score the sum of 3s", () => {
-        //given
-        let throw1 = new YatzyThrow(1, 2, 3, 2, 3);
-        let throw2 = new YatzyThrow(2, 3, 3, 3, 3);
+        jsc.checkForall(Generators.yatzyThrowGenerator, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.threes(throw1);
-        let score2 = YatzyScorer.threes(throw2);
+            // when
+            let score = YatzyScorer.threes(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 6);
-        assert.strictEqual(score2, 12);
+            // then
+            return _.isEqual(score, _.reduce(yatzyThrow.dice, (acc, die) => die === 3 ? acc + die : acc, 0));
+        });
     });
 });
 
 describe("Fours", () => {
     it("score the sum of 4s", () => {
-        // given
-        let throw1 = new YatzyThrow(4,4,4,5,5);
-        let throw2 = new YatzyThrow(4,4,5,5,5);
-        let throw3 = new YatzyThrow(4,5,5,5,5);
+        jsc.checkForall(Generators.yatzyThrowGenerator, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.fours(throw1);
-        let score2 = YatzyScorer.fours(throw2);
-        let score3 = YatzyScorer.fours(throw3);
+            // when
+            let score = YatzyScorer.fours(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 12);
-        assert.strictEqual(score2, 8);
-        assert.strictEqual(score3, 4);
+            // then
+            return _.isEqual(score, _.reduce(yatzyThrow.dice, (acc, die) => die === 4 ? acc + die : acc, 0));
+        });
     });
 });
 
 describe("Fives", () => {
     it("score the sum of fives", () => {
-        // given
-        let throw1 = new YatzyThrow(4,4,4,5,5);
-        let throw2 = new YatzyThrow(4,4,5,5,5);
-        let throw3 = new YatzyThrow(4,5,5,5,5);
+        jsc.checkForall(Generators.yatzyThrowGenerator, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.fives(throw1);
-        let score2 = YatzyScorer.fives(throw2);
-        let score3 = YatzyScorer.fives(throw3);
+            // when
+            let score = YatzyScorer.fives(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 10);
-        assert.strictEqual(score2, 15);
-        assert.strictEqual(score3, 20);
+            // then
+            return _.isEqual(score, _.reduce(yatzyThrow.dice, (acc, die) => die === 5 ? acc + die : acc, 0));
+        });
     });
 });
 
 describe("Sixes", () => {
     it("score the sum of sixes", () => {
-        // given
-        let throw1 = new YatzyThrow(4,4,4,5,5);
-        let throw2 = new YatzyThrow(4,4,6,5,5);
-        let throw3 = new YatzyThrow(6,5,6,6,5);
+        jsc.checkForall(Generators.yatzyThrowGenerator, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.sixes(throw1);
-        let score2 = YatzyScorer.sixes(throw2);
-        let score3 = YatzyScorer.sixes(throw3);
+            // when
+            let score = YatzyScorer.sixes(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 0);
-        assert.strictEqual(score2, 6);
-        assert.strictEqual(score3, 18);
+            // then
+            return _.isEqual(score, _.reduce(yatzyThrow.dice, (acc, die) => die === 6 ? acc + die : acc, 0));
+        });
     });
 });
 
 describe("One pair", () => {
     it("should score the sum of the highest pair", () => {
-        // given
-        let throw1 = new YatzyThrow(3, 4, 3, 5, 6);
-        let throw2 = new YatzyThrow(5, 3, 3, 3, 5);
-        let throw3 = new YatzyThrow(5, 3, 6, 6, 5);
-        let throw4 = new YatzyThrow(1, 2, 3, 4, 5);
+        jsc.checkForall(Generators.onePairArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.pair(throw1);
-        let score2 = YatzyScorer.pair(throw2);
-        let score3 = YatzyScorer.pair(throw3);
-        let score4 = YatzyScorer.pair(throw4);
+            // when
+            let score = YatzyScorer.pair(yatzyThrow.yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 6);
-        assert.strictEqual(score2, 10);
-        assert.strictEqual(score3, 12);
-        assert.strictEqual(score4, 0);
+            // then
+            return _.isEqual(score, yatzyThrow.pair * 2);
+        });
     });
 
     it("should score 0 when there is no pair", () => {
-        // given
-        let throw1 = new YatzyThrow(1, 2, 3, 4, 5);
+        jsc.checkForall(Generators.notOnePairArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.pair(throw1);
+            // when
+            let score = YatzyScorer.pair(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 0);
+            // then
+            return _.isEqual(score, 0);
+        });
     });
 });
 
 describe("Two pair", () => {
     it("should score the sum of the two pairs", () => {
-        // given
-        let throw1 = new YatzyThrow(3, 3, 5, 4, 5);
-        let throw2 = new YatzyThrow(3, 3, 5, 5, 5);
+        jsc.checkForall(Generators.twoPairGenerator, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.two_pair(throw1);
-        let score2 = YatzyScorer.two_pair(throw2);
+            // when
+            let score = YatzyScorer.twoPair(yatzyThrow.yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 16);
-        assert.strictEqual(score2, 16);
+            // then
+            return _.isEqual(score, (yatzyThrow.pair1 + yatzyThrow.pair2) * 2);
+        });
 
     });
-    it("should score 0 if one pair", () => {
-        // given
-        let throw1 = new YatzyThrow(3, 3, 1, 4, 5);
+    it("should score 0 if no two pair", () => {
+        jsc.checkForall(Generators.notTwoPairArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.two_pair(throw1);
+            // when
+            let score = YatzyScorer.twoPair(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 0);
-
-    });
-    it("should score 0 if no pair", () => {
-        // given
-        let throw1 = new YatzyThrow(3, 1, 1, 4, 5);
-
-        // when
-        let score1 = YatzyScorer.two_pair(throw1);
-
-        // then
-        assert.strictEqual(score1, 0);
+            // then
+            return _.isEqual(score, 0);
+        });
 
     });
 });
 
 describe("Three of a kind", () => {
     it("should score the sum of the three of the kind", () => {
-        // given
-        let throw1 = new YatzyThrow(3, 3, 3, 4, 5);
-        let throw2 = new YatzyThrow(5, 3, 5, 4, 5);
-        let throw3 = new YatzyThrow(3, 3, 3, 3, 5);
+        jsc.checkForall(Generators.atLeastThreeOfAKindGenerator, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.three_of_a_kind(throw1);
-        let score2 = YatzyScorer.three_of_a_kind(throw2);
-        let score3 = YatzyScorer.three_of_a_kind(throw3);
+            // when
+            let score = YatzyScorer.threeOfAKind(yatzyThrow.yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 9);
-        assert.strictEqual(score2, 15);
-        assert.strictEqual(score3, 9);
+            // then
+            return _.isEqual(score, yatzyThrow.threeOfAKind * 3);
+        });
     });
     it("should score 0 when there is no the three of the kind", () => {
-        // given
-        let throw1 = new YatzyThrow(3, 3, 1, 4, 5);
+        jsc.checkForall(Generators.notThreeOfAKindArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.three_of_a_kind(throw1);
+            // when
+            let score = YatzyScorer.threeOfAKind(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 0);
+            // then
+            return _.isEqual(score, 0);
+        });
     });
 });
 
 describe("Four of a kind", () => {
     it("should score the sum of the four of the kind", () => {
-        // given
-        let throw1 = new YatzyThrow(3, 3, 3, 3, 5);
-        let throw2 = new YatzyThrow(5, 5, 5, 4, 5);
-        let throw3 = new YatzyThrow(3, 3, 3, 3, 3);
+        jsc.checkForall(Generators.atLeastFourOfAKindGenerator, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.four_of_a_kind(throw1);
-        let score2 = YatzyScorer.four_of_a_kind(throw2);
-        let score3 = YatzyScorer.four_of_a_kind(throw3);
+            // when
+            let score = YatzyScorer.fourOfAKind(yatzyThrow.yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 12);
-        assert.strictEqual(score2, 20);
-        assert.strictEqual(score3, 12);
+            // then
+            return _.isEqual(score, yatzyThrow.fourOfAKind * 4);
+        });
     });
     it("should score 0 when there is no the four of the kind", () => {
-        // given
-        let throw1 = new YatzyThrow(3, 3, 1, 4, 5);
+        jsc.checkForall(Generators.notFourOfAKindArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.four_of_a_kind(throw1);
+            // when
+            let score = YatzyScorer.fourOfAKind(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 0);
+            // then
+            return _.isEqual(score, 0);
+        });
     });
 });
 
@@ -290,93 +237,83 @@ describe("Small straight", () => {
     it("should score 15", () => {
         // given
         let throw1 = new YatzyThrow(1, 2, 3, 4, 5);
-        let throw2 = new YatzyThrow(2, 3, 4, 5, 1);
 
         // when
-        let score1 = YatzyScorer.small_straight(throw1);
-        let score2 = YatzyScorer.small_straight(throw2);
+        let score1 = YatzyScorer.smallStraight(throw1);
 
         // then
         assert.strictEqual(score1, 15);
-        assert.strictEqual(score2, 15);
     });
     it("should score 0 when no small straight", () => {
-        // given
-        let throw1 = new YatzyThrow(1, 2, 2, 4, 5);
+        jsc.checkForall(Generators.notSmallStraightArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.small_straight(throw1);
+            // when
+            let score = YatzyScorer.smallStraight(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 0);
-    });
-    it("should score 0 when large straight", () => {
-        // given
-        let throw1 = new YatzyThrow(2, 3, 4, 5, 6);
-
-        // when
-        let score1 = YatzyScorer.small_straight(throw1);
-
-        // then
-        assert.strictEqual(score1, 0);
+            // then
+            return _.isEqual(score, 0);
+        });
     });
 });
 
 describe("Large straight", () => {
     it("should score 20", () => {
         // given
-        let throw1 = new YatzyThrow(6,2,3,4,5);
-        let throw2 = new YatzyThrow(2,3,4,5,6);
+        let throw1 = new YatzyThrow(2, 3, 4, 5, 6);
 
         // when
-        let score1 = YatzyScorer.large_straight(throw1);
-        let score2 = YatzyScorer.large_straight(throw2);
+        let score1 = YatzyScorer.largeStraight(throw1);
 
         // then
         assert.strictEqual(score1, 20);
-        assert.strictEqual(score2, 20);
     });
     it("should score 0 when no large straight", () => {
-        // given
-        let throw1 = new YatzyThrow(1, 2, 2, 4, 5);
+        jsc.checkForall(Generators.notLargeStraightArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.small_straight(throw1);
+            // when
+            let score = YatzyScorer.largeStraight(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 0);
-    });
-    it("should score 0 when small straight", () => {
-        // given
-        let throw1 = new YatzyThrow(1,2, 3, 4, 5);
-
-        // when
-        let score1 = YatzyScorer.large_straight(throw1);
-
-        // then
-        assert.strictEqual(score1, 0);
+            // then
+            return _.isEqual(score, 0);
+        });
     });
 });
 
 describe("Full house", () => {
     it("should score the sum of the full house", () => {
-        // given
-        let throw1 = new YatzyThrow(6,2,2,2,6);
+        jsc.checkForall(Generators.fullHouseArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.full_house(throw1);
+            // when
+            let score = YatzyScorer.fullHouse(yatzyThrow.yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 18);
+            // then
+            return _.isEqual(score, yatzyThrow.pair * 2 + yatzyThrow.threeOfAKind * 3);
+        });
     });
-    it("should score 0 if no the full house", () => {
-        // given
-        let throw1 = new YatzyThrow(2,3,4,5,6);
+    it("should score O if no the full house", () => {
+        jsc.checkForall(Generators.notFullHouseArbitrary, (yatzyThrow) => {
+            // given
 
-        // when
-        let score1 = YatzyScorer.full_house(throw1);
+            // when
+            let score = YatzyScorer.fullHouse(yatzyThrow);
 
-        // then
-        assert.strictEqual(score1, 0);
+            // then
+            return _.isEqual(score, 0);
+        });
+    });
+    it("should score 0 if yatzee", () => {
+        jsc.checkForall(jsc.integer(1, 6), die => {
+            // given
+            let yatzyThrow = new YatzyThrow(die, die, die, die, die);
+
+            // when
+            let score = YatzyScorer.fullHouse(yatzyThrow);
+
+            // then
+            return _.isEqual(score, 0);
+        });
     });
 });

@@ -1,20 +1,27 @@
-const assert = require("assert");
+const jsc = require("jsverify");
 const YatzyThrow = require("../lib/yatzy_throw");
+const Generators = require("./generators");
 
-describe('YatzyThrow', function () {
-    it('should not accept 0', function () {
-        assert.throws(() => new YatzyThrow(0, 2, 3, 4, 5));
+describe('YatzyThrow', () => {
+    it('should not accept non die values', () => {
+        jsc.checkForall(Generators.notADieArbitrary, Generators.notADieArbitrary, Generators.notADieArbitrary, Generators.notADieArbitrary, Generators.notADieArbitrary, (d1, d2, d3, d4, d5) => {
+            try {
+                new YatzyThrow(d1, d2, d3, d4, d5);
+            } catch (e) {
+                return true;
+            }
+            return false;
+        });
     });
 
-    it('should not accept 7', function () {
-        assert.throws(() => new YatzyThrow(1, 2, 3, 4, 7));
-    });
-
-    it('should accept values between 1 and 6', function () {
-        // given
-        assert.doesNotThrow(() => new YatzyThrow(1, 2, 3, 4, 5));
-        assert.doesNotThrow(() => new YatzyThrow(2, 3, 4, 5, 6));
-
-        console.log(new YatzyThrow(1, 1, 1, 3, 4).diceCount[1])
+    it('should accept values between 1 and 6', () => {
+        jsc.checkForall(Generators.dieArbitrary, Generators.dieArbitrary, Generators.dieArbitrary, Generators.dieArbitrary, Generators.dieArbitrary, (d1, d2, d3, d4, d5) => {
+            try {
+                new YatzyThrow(d1, d2, d3, d4, d5);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        });
     });
 });

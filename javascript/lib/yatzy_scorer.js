@@ -21,7 +21,7 @@ module.exports.pair = (yatzyThrow) => {
     return _.isEmpty(pairs) ? 0 : _.max(_.keys(pairs)) * 2;
 };
 
-module.exports.two_pair = (yatzyThrow) => {
+module.exports.twoPair = (yatzyThrow) => {
     let pairs = _.pickBy(yatzyThrow.diceCount, value => value >= 2);
     let keys = _.keys(pairs);
 
@@ -31,27 +31,25 @@ module.exports.two_pair = (yatzyThrow) => {
     return 0;
 };
 
-module.exports.three_of_a_kind = (yatzyThrow) => {
+module.exports.threeOfAKind = (yatzyThrow) => {
     let three_of_a_kind = _.pickBy(yatzyThrow.diceCount, value => value >= 3);
     return _.isEmpty(three_of_a_kind) ? 0 : _.keys(three_of_a_kind) * 3;
 };
 
-module.exports.four_of_a_kind = (yatzyThrow) => {
+module.exports.fourOfAKind = (yatzyThrow) => {
     let three_of_a_kind = _.pickBy(yatzyThrow.diceCount, value => value >= 4);
     return _.isEmpty(three_of_a_kind) ? 0 : _.keys(three_of_a_kind) * 4;
 };
 
-module.exports.small_straight = (yatzyThrow) => {
-    let keys = _.keys(yatzyThrow.diceCount);
-    return keys.length === 5 && keys.indexOf("1") !== -1 ? 15 : 0
+module.exports.smallStraight = (yatzyThrow) => {
+    return _.difference([1, 2, 3, 4, 5], yatzyThrow.dice).length === 0 ? 15 : 0;
 };
 
-module.exports.large_straight = (yatzyThrow) => {
-    let keys = _.keys(yatzyThrow.diceCount);
-    return keys.length === 5 && keys.indexOf("6") !== -1 ? 20 : 0
+module.exports.largeStraight = (yatzyThrow) => {
+    return _.difference([2, 3, 4, 5, 6], yatzyThrow.dice).length === 0 ? 20 : 0;
 };
 
-module.exports.full_house = (yatzyThrow) => {
+module.exports.fullHouse = (yatzyThrow) => {
     let three_of_kind = _.pickBy(yatzyThrow.diceCount, value => value >= 3);
     let two_of_a_kind = _.pickBy(yatzyThrow.diceCount, value => value === 2);
 
