@@ -6,7 +6,6 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import org.junit.runner.RunWith;
 
-import static fr.camory.Die.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assumptions.assumeThat;
 
@@ -181,9 +180,9 @@ public class YatzyScorerTest {
     }
 
     @Property
-    public void small_straight_should_score_15() {
+    public void small_straight_should_score_15(YatzyThrow yatzyThrow) {
         // given
-        final YatzyThrow yatzyThrow = new YatzyThrow(ONE, TWO, THREE, FOUR, FIVE);
+        assumeThat(yatzyThrow.diceCount().size() == 5 && yatzyThrow.dice().map(Die::value).sum().intValue() == 15).isTrue();
 
         // when
         final long score = YatzyScorer.smallStraight(yatzyThrow);
@@ -195,10 +194,7 @@ public class YatzyScorerTest {
     @Property
     public void small_straight_should_score_0_when_it_is_not_small_straight(YatzyThrow yatzyThrow) {
         // given
-        assumeThat(
-                (yatzyThrow.dice().distinct().size() == 5 && !yatzyThrow.contains(ONE))
-                        || yatzyThrow.dice().distinct().size() != 5)
-                .isTrue();
+        assumeThat(yatzyThrow.diceCount().size() == 5 && yatzyThrow.dice().map(Die::value).sum().intValue() == 15).isFalse();
 
         // when
         final long score = YatzyScorer.smallStraight(yatzyThrow);
@@ -208,9 +204,9 @@ public class YatzyScorerTest {
     }
 
     @Property
-    public void large_straight_should_score_20() {
+    public void large_straight_should_score_20(YatzyThrow yatzyThrow) {
         // given
-        final YatzyThrow yatzyThrow = new YatzyThrow(TWO, THREE, FOUR, FIVE, SIX);
+        assumeThat(yatzyThrow.diceCount().size() == 5 && yatzyThrow.dice().map(Die::value).sum().intValue() == 20).isTrue();
 
         // when
         final long score = YatzyScorer.largeStraight(yatzyThrow);
@@ -222,10 +218,7 @@ public class YatzyScorerTest {
     @Property
     public void large_straight_should_score_0_when_it_is_not_large_straight(YatzyThrow yatzyThrow) {
         // given
-        assumeThat(
-                (yatzyThrow.dice().distinct().size() == 5 && !yatzyThrow.contains(SIX))
-                        || yatzyThrow.dice().distinct().size() != 5)
-                .isTrue();
+        assumeThat(yatzyThrow.diceCount().size() == 5 && yatzyThrow.dice().map(Die::value).sum().intValue() == 20).isFalse();
 
         // when
         final long score = YatzyScorer.largeStraight(yatzyThrow);

@@ -1,6 +1,7 @@
 package fr.camory;
 
 import io.vavr.Tuple2;
+import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.control.Option;
 
@@ -83,11 +84,11 @@ class YatzyScorer {
     }
 
     static int smallStraight(YatzyThrow yatzyThrow) {
-        return yatzyThrow.diceCount().size() == 5 && yatzyThrow.contains(ONE) ? 15 : 0;
+        return List.of(ONE, TWO, THREE, FOUR, FIVE).removeAll(yatzyThrow.dice()).size() == 0 ? 15 : 0;
     }
 
     static int largeStraight(YatzyThrow yatzyThrow) {
-        return yatzyThrow.diceCount().size() == 5 && yatzyThrow.contains(SIX) ? 20 : 0;
+        return List.of(TWO, THREE, FOUR, FIVE, SIX).removeAll(yatzyThrow.dice()).size() == 0 ? 20 : 0;
     }
 
     static int fullHouse(final YatzyThrow yatzyThrow) {
